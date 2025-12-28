@@ -1,7 +1,8 @@
 <?php
 // 新增图书接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 插入图书信息
         $stmt = $pdo->prepare("INSERT INTO Book (isbn, title, category_id, publisher_id, publish_date, total_stock, available_stock) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $result = $stmt->execute([$isbn, $title, $category_id, $publisher_id, $publish_date, $total_stock, $total_stock]);
-        
+
         if ($result) {
             $bookId = $pdo->lastInsertId();
 

@@ -1,7 +1,8 @@
 <?php
 // 查询作者列表接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
@@ -15,24 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 构建查询语句
         $query = "
-            SELECT 
+            SELECT
                 author_id,
                 name,
                 country
             FROM Author
             WHERE 1=1
         ";
-        
+
         $params = [];
-        
+
         if (!empty($name)) {
             $query .= " AND name LIKE ?";
             $params[] = "%$name%";
         }
-        
-        $query .= " ORDER BY author_id DESC LIMIT ? OFFSET ?";
-        $params[] = $limit;
-        $params[] = $offset;
+
+        $query .= " ORDER BY author_id DESC LIMIT :limit OFFSET :offset";
+
+        // 使用字符串替换而不是参数绑定，因为LIMIT子句不能使用预处理语句的占位符
+        $query = str_replace(':limit', (int)$limit, $query);
+        $query = str_replace(':offset', (int)$offset, $query);
 
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
@@ -40,21 +43,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 获取总数用于分页
         $countQuery = "
-            SELECT COUNT(*) 
+            SELECT COUNT(*)
             FROM Author
             WHERE 1=1
         ";
         $countParams = [];
-        
+
         if (!empty($name)) {
             $countQuery .= " AND name LIKE ?";
             $countParams[] = "%$name%";
         }
-        
+
         $countStmt = $pdo->prepare($countQuery);
         $countStmt->execute($countParams);
         $total = $countStmt->fetchColumn();
-        
+
         sendResponse(0, '查询成功', [
             'authors' => $authors,
             'pagination' => [

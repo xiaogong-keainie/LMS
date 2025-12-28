@@ -143,8 +143,6 @@ class AuthorTest {
             echo "查询作者列表过程中发生错误: " . $e->getMessage() . "\n";
             return false;
         }
-
-        echo "查询作者列表功能测试完成\n";
     }
 
     /**

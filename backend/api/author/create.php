@@ -1,7 +1,8 @@
 <?php
 // 新增作者接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 插入作者信息
         $stmt = $pdo->prepare("INSERT INTO Author (name, country) VALUES (?, ?)");
         $result = $stmt->execute([$name, $country]);
-        
+
         if ($result) {
             $authorId = $pdo->lastInsertId();
 

@@ -1,7 +1,8 @@
 <?php
 // 查询分类列表接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
@@ -16,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 构建查询语句
         $query = "
-            SELECT 
+            SELECT
                 category_id,
                 category_name,
                 description,
@@ -24,22 +25,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             FROM Category
             WHERE 1=1
         ";
-        
+
         $params = [];
-        
+
         if (!empty($category_name)) {
             $query .= " AND category_name LIKE ?";
             $params[] = "%$category_name%";
         }
-        
+
         if ($parent_id >= 0) {
             $query .= " AND parent_id = ?";
             $params[] = $parent_id;
         }
-        
-        $query .= " ORDER BY category_id DESC LIMIT ? OFFSET ?";
-        $params[] = $limit;
-        $params[] = $offset;
+
+        $query .= " ORDER BY category_id DESC LIMIT :limit OFFSET :offset";
+
+        // 使用字符串替换而不是参数绑定，因为LIMIT子句不能使用预处理语句的占位符
+        $query = str_replace(':limit', (int)$limit, $query);
+        $query = str_replace(':offset', (int)$offset, $query);
 
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
@@ -47,26 +50,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 获取总数用于分页
         $countQuery = "
-            SELECT COUNT(*) 
+            SELECT COUNT(*)
             FROM Category
             WHERE 1=1
         ";
         $countParams = [];
-        
+
         if (!empty($category_name)) {
             $countQuery .= " AND category_name LIKE ?";
             $countParams[] = "%$category_name%";
         }
-        
+
         if ($parent_id >= 0) {
             $countQuery .= " AND parent_id = ?";
             $countParams[] = $parent_id;
         }
-        
+
         $countStmt = $pdo->prepare($countQuery);
         $countStmt->execute($countParams);
         $total = $countStmt->fetchColumn();
-        
+
         sendResponse(0, '查询成功', [
             'categories' => $categories,
             'pagination' => [

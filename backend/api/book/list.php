@@ -1,7 +1,8 @@
 <?php
 // 查询图书列表接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
@@ -16,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 构建查询语句
         $query = "
-            SELECT 
+            SELECT
                 b.book_id,
                 b.title,
                 b.isbn,
@@ -32,22 +33,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             LEFT JOIN Publisher p ON b.publisher_id = p.publisher_id
             WHERE 1=1
         ";
-        
+
         $params = [];
-        
+
         if (!empty($title)) {
             $query .= " AND b.title LIKE ?";
             $params[] = "%$title%";
         }
-        
+
         if ($category_id > 0) {
             $query .= " AND b.category_id = ?";
             $params[] = $category_id;
         }
-        
-        $query .= " ORDER BY b.book_id DESC LIMIT ? OFFSET ?";
-        $params[] = $limit;
-        $params[] = $offset;
+
+        $query .= " ORDER BY b.book_id DESC LIMIT :limit OFFSET :offset";
+
+        // 使用命名参数而不是位置参数，因为LIMIT子句不能使用预处理语句的占位符
+        $query = str_replace(':limit', (int)$limit, $query);
+        $query = str_replace(':offset', (int)$offset, $query);
 
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
@@ -55,26 +58,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 获取总数用于分页
         $countQuery = "
-            SELECT COUNT(*) 
+            SELECT COUNT(*)
             FROM Book b
             WHERE 1=1
         ";
         $countParams = [];
-        
+
         if (!empty($title)) {
             $countQuery .= " AND b.title LIKE ?";
             $countParams[] = "%$title%";
         }
-        
+
         if ($category_id > 0) {
             $countQuery .= " AND b.category_id = ?";
             $countParams[] = $category_id;
         }
-        
+
         $countStmt = $pdo->prepare($countQuery);
         $countStmt->execute($countParams);
         $total = $countStmt->fetchColumn();
-        
+
         sendResponse(0, '查询成功', [
             'books' => $books,
             'pagination' => [

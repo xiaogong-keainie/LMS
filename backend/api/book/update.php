@@ -1,7 +1,8 @@
 <?php
 // 修改图书接口
-require_once '../../config.php';
-require_once '../../utils.php';
+$baseDir = dirname(dirname(__DIR__)); // 获取 backend 目录的路径
+require_once $baseDir . '/config.php';
+require_once $baseDir . '/utils.php';
 
 // 从URL路径中获取book_id
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

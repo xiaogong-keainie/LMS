@@ -173,7 +173,6 @@ class BookTest {
             return false;
         }
 
-        echo "查询图书列表功能测试完成\n";
     }
 
     /**
@@ -233,8 +232,6 @@ class BookTest {
             echo "更新图书过程中发生错误: " . $e->getMessage() . "\n";
             return false;
         }
-
-        echo "更新图书功能测试完成\n";
     }
 
     /**
@@ -314,8 +311,6 @@ class BookTest {
             echo "删除图书过程中发生错误: " . $e->getMessage() . "\n";
             return false;
         }
-
-        echo "删除图书功能测试完成\n";
     }
 
     /**
