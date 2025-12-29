@@ -20,7 +20,7 @@ try {
         FROM Borrow b
         INNER JOIN User u ON b.user_id = u.user_id
         INNER JOIN Book bo ON b.book_id = bo.book_id
-        WHERE b.status = 'borrowed' AND b.due_date < NOW()
+        WHERE b.status = 'overdue' AND b.due_date < NOW()
         ORDER BY days_overdue DESC
     ");
     $stmt->execute();
