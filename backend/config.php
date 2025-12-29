@@ -2,8 +2,8 @@
 // 数据库配置文件
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '123456789Zhu.');
-define('DB_NAME', 'lms_db');
+define('DB_PASS', 'liyi20050830');
+define('DB_NAME', 'db_big_project');
 
 // 创建数据库连接
 function getConnection() {

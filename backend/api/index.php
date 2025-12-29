@@ -52,15 +52,15 @@ foreach ($routing_table as $route) {
 
 // 检查动态路由（包含正则表达式的路由）
 $dynamic_routes = [
+    ['pattern' => '/^\/borrow\/user\/(\d+)$/', 'method' => 'GET', 'file' => 'borrow/user_borrows.php'],
     ['pattern' => '/^\/book\/update\/(\d+)$/', 'method' => 'PUT', 'file' => 'book/update.php'],
     ['pattern' => '/^\/book\/delete\/(\d+)$/', 'method' => 'DELETE', 'file' => 'book/delete.php'],
     ['pattern' => '/^\/borrow\/return\/(\d+)$/', 'method' => 'PUT', 'file' => 'borrow/return.php'],
-    ['pattern' => '/^\/borrow\/user\/(\d+)$/', 'method' => 'GET', 'file' => 'borrow/user_borrows.php'],
     ['pattern' => '/^\/query\/users-borrowed-book\/(\d+)$/', 'method' => 'GET', 'file' => 'query/users_borrowed_book.php'],
 ];
 
 foreach ($dynamic_routes as $route) {
-    if (preg_match($route['pattern'], $path) && $_SERVER['REQUEST_METHOD'] === $route['method']) {
+    if (preg_match($route['pattern'], $api_path) && $_SERVER['REQUEST_METHOD'] === $route['method']) {
         require_once $route['file'];
         exit;
     }
